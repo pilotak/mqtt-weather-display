@@ -36,7 +36,10 @@ myVar my_var;
 time_t current_time;
 float out_temp, out_temp_feel, in_temp;
 unsigned int power_value;
-byte forecast_icon = 0xFF;
+int forecast_icon = 0xFFFF;
+
+bool night_mode = false;
+bool night_mode_prev = false;
 
 bool popup = false, draw_all = false;
 
@@ -65,6 +68,7 @@ void drawMyIcon(const uint16_t* icon, int x, int y, int w, int h){
       buffidx++;
     } // end pixel
   }   
+  yield();
 }
 
 
@@ -200,6 +204,8 @@ void drawForecast(){
     case 35:
       drawMyIcon(wind_rain);
       break;
+    case 0xFFFF:
+      break;
     default:
       tft.setCursor(20,63);
       tft.setTextColor(0x8de4);
@@ -240,7 +246,7 @@ void drawOutTemp(){
       break;
   }
   
-  tft.fillRect(117, y-19, 113, 26, background_colour);
+  tft.fillRect(117, y-24, 113, 32, background_colour);
   tft.setCursor(x,y);
   tft.setTextColor(font_colour);
   tft.setFont(&Open_Sans_Bold_32);

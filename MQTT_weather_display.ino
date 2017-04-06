@@ -46,7 +46,17 @@ void loop(){
     client.loop();
   }
   
-  if(draw_all) drawAll();
+  if((draw_all && !night_mode) || (!night_mode && night_mode_prev)) {
+    digitalWrite(0,LOW);
+    drawAll();
+  }
+  if(night_mode && !night_mode_prev) {
+    analogWrite(0, 200);
+    tft.fillScreen(background_colour);
+    drawTime();
+  }
   if(!popup) timeRefresh();
+  
+  night_mode_prev = night_mode;
 }
 

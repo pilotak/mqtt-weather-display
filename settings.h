@@ -6,7 +6,7 @@ const unsigned int font_colour = 0xFFFF;
 
 #define NTP_SERVER_NAME "ntp.nic.cz"
 #define UDP_LOCAL_PORT 8888
-#define NTP_SYNC_INTERVAL 300 //seconds
+#define NTP_SYNC_INTERVAL 7200 //seconds = 2h
 
 #define WIFI_SSID "***"
 #define WIFI_PASSWORD "***"
@@ -27,3 +27,4 @@ TimeChangeRule standardTime = {"CET", Last, Sun, Oct, 2, 60};    // UTC + 1 hour
 #define MQTT_TOPIC_OUT_TEMP_FEEL "display/out_temp_feel"
 #define MQTT_TOPIC_FORECAST "display/forecast"
 #define MQTT_TOPIC_POWER "display/power"
+#define MQTT_TOPIC_NIGHT_MODE "display/night"

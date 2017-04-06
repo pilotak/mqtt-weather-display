@@ -21,28 +21,32 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   }
 
   float temp_tmp = data.get<float>("temp");
-  unsigned int icon_tmp = data.get<unsigned int>("icon");
-  unsigned int power_tmp = data.get<unsigned int>("power");
+  int icon_tmp = data.get<int>("icon");
+  int power_tmp = data.get<int>("power");
+  int mode_tmp = data.get<int>("night");
 
   if(strcmp(topic, MQTT_TOPIC_IN_TEMP) == 0 && temp_tmp != NULL) {
     in_temp = temp_tmp;
-    drawInTemp();
+    if(!night_mode) drawInTemp();
   }
   else if(strcmp(topic, MQTT_TOPIC_OUT_TEMP) == 0 && temp_tmp != NULL) {
     out_temp = temp_tmp;
-    drawOutTemp();
+    if(!night_mode) drawOutTemp();
   }
   else if(strcmp(topic, MQTT_TOPIC_OUT_TEMP_FEEL) == 0 && temp_tmp != NULL) {
     out_temp_feel = temp_tmp;
-    drawOutTempFeel();
+    if(!night_mode) drawOutTempFeel();
   }
-  else if(strcmp(topic, MQTT_TOPIC_FORECAST) == 0 && icon_tmp != NULL) {
+  else if(strcmp(topic, MQTT_TOPIC_FORECAST) == 0) {
     forecast_icon = icon_tmp;
-    drawForecast();
+    if(!night_mode) drawForecast();
   }
   else if(strcmp(topic, MQTT_TOPIC_POWER) == 0 && power_tmp != NULL) {
     power_value = power_tmp;
-    drawPower();
+    if(!night_mode) drawPower();
+  }
+  else if(strcmp(topic, MQTT_TOPIC_NIGHT_MODE) == 0) {
+    night_mode = (bool)mode_tmp;
   }
 }
 
