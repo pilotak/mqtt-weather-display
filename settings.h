@@ -1,5 +1,7 @@
 const byte TFT_DC = 5;
 const byte TFT_CS = 15;
+const byte RST_PIN = 4;
+const byte LED_PIN = 2;
 
 const unsigned int background_colour = 0x0000;
 const unsigned int font_colour = 0xFFFF;

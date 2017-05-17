@@ -19,10 +19,11 @@
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("ILI9341 Test!"); 
-  pinMode(0,OUTPUT);
-  analogWrite(0, 10);
- 
+  Serial.println("ESP8266 ILI9341 MQTT"); 
+  pinMode(LED_PIN,OUTPUT);
+  pinMode(RST_PIN,INPUT);
+  digitalWrite(LED_PIN,HIGH);
+  
   tft.begin();
   setupWifi();
   setupNtp();
@@ -47,11 +48,11 @@ void loop(){
   }
   
   if((draw_all && !night_mode) || (!night_mode && night_mode_prev)) {
-    digitalWrite(0,LOW);
+    digitalWrite(LED_PIN,HIGH);
     drawAll();
   }
   if(night_mode && !night_mode_prev) {
-    analogWrite(0, 200);
+    analogWrite(LED_PIN, 30);
     tft.fillScreen(background_colour);
     drawTime();
   }
