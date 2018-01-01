@@ -1,6 +1,9 @@
+#include <DS3232RTC.h> 
 #include <TimeLib.h>
 #include <Timezone.h>
+#include <Wire.h>
 #include <ESP8266WiFi.h>
+#include <DNSServer.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
@@ -13,12 +16,12 @@
 #include "settings.h"
 #include "display.h"
 #include "wifi.h"
-#include "mqtt.h"
 #include "time.h"
+#include "mqtt.h"
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("ESP8266 ILI9341 MQTT"); 
   pinMode(LED_PIN,OUTPUT);
   pinMode(RST_PIN,INPUT);
@@ -26,15 +29,13 @@ void setup() {
   
   tft.begin();
   setupWifi();
-  setupNtp();
+  setupTime();
   setupMqtt();
-
-  current_time = myTZ.toLocal(now(), &tcr);
 }
 
 void loop(){
   ArduinoOTA.handle();
-  
+
   if (!client.connected()) {
     long now = millis();
     if (now - lastReconnectAttempt > 5000) {

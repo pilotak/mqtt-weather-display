@@ -41,7 +41,8 @@ void sendNTPpacket(IPAddress &address){
   Udp.endPacket();
 }
 
-time_t getNtpTime(){
+bool getNtpTime(){
+  Serial.println("Synchronizing with NTP");
   IPAddress ntpServerIP; // NTP server's ip address
 
   while (Udp.parsePacket() > 0) ; // discard any previously received packets
@@ -65,22 +66,39 @@ time_t getNtpTime(){
       secsSince1900 |= (unsigned long)packetBuffer[42] << 8;
       secsSince1900 |= (unsigned long)packetBuffer[43];
       draw_all = true;
-      return secsSince1900 - 2208988800UL;
+      time_t t = secsSince1900 - 2208988800UL;
+      Serial.print("Timestamp new:");
+      Serial.println(t);
+      RTC.set(t); 
+      setTime(t);
+      return true;
     }
   }
   Serial.println("No NTP Response :-(");
   drawIconText(ICON_REFRESH, "Sychronizace casu se", "nezdarila");
   draw_all = true;
-  delay(1000);
-  return 0; // return 0 if unable to get the time
+  return false;
 }
 
-void setupNtp(){
+void setupTime(){
   Serial.println("Starting UDP");
   Udp.begin(UDP_LOCAL_PORT);
-  Serial.println("waiting for sync");
-  setSyncProvider(getNtpTime);
-  setSyncInterval(NTP_SYNC_INTERVAL);
+  
+  setSyncProvider(RTC.get);   // the function to get the time from the RTC
+  setSyncInterval(RTC_SYNC_INTERVAL); 
+  
+  if(timeStatus() != timeSet) {
+    Serial.println("Unable to sync with the RTC, will sync with NTP");
+    getNtpTime();
+  }
+  else {
+    Serial.println("RTC has set the system time");
+  }  
+
+  current_time = myTZ.toLocal(now(), &tcr);
+
+  Serial.print("Current time: ");
+  Serial.println(current_time);
 }
 
 
