@@ -2,7 +2,7 @@ void setupWifi(){
   tft.fillScreen(background_colour);
   drawIconText(ICON_WIFI, "Pripojovani k", WIFI_SSID);
   WiFi.disconnect();
-  WiFi.mode(WIFI_AP_STA);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   
   byte part = 0;
