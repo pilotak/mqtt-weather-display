@@ -1,17 +1,7 @@
 # MQTT weather display
 Simple weather and time display, ready to be controlled from MQTT, based on ESP8266, ILI9341 and DS3231. Icon names are based on clientraw format weather station.
 
-
-In order to compile, you need to install following libraries
-* ArduinoJSON https://github.com/bblanchon/ArduinoJson
-* Adafruit GFX https://github.com/adafruit/Adafruit-GFX-Library
-* Adafruit ILI9341 https://github.com/adafruit/Adafruit_ILI9341
-* PubSubClient https://github.com/Imroy/pubsubclient
-* Time https://github.com/PaulStoffregen/Time
-* Timezone Library https://github.com/JChristensen/Timezone
-* DS3231 driver https://github.com/JChristensen/DS3232RTC
-
-**Custom component from clientraw weather station can be found [here](https://github.com/pilotak/Home-AssistantConfig/tree/master/custom_components/sensor)**
+**Custom component from clientraw weather station fot HomeAssistant can be found [here](https://github.com/pilotak/Home-AssistantConfig/tree/master/custom_components/sensor)**
 
 HomeAssistant config:
 

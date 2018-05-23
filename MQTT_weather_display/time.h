@@ -5,6 +5,7 @@ byte packetBuffer[NTP_PACKET_SIZE];
 
 Timezone myTZ(summerTime, standardTime);
 TimeChangeRule *tcr;
+DS3232RTC RTC(false); 
 
 time_t nextTimeCheck = 0;
 
