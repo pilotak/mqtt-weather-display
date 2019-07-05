@@ -1,64 +1,85 @@
-#include <DS3232RTC.h> 
-#include <TimeLib.h>
-#include <Timezone.h>
-#include <Wire.h>
-#include <ESP8266WiFi.h>
-#include <DNSServer.h>
-#include <ESP8266mDNS.h>
-#include <WiFiUdp.h>
-#include <ArduinoOTA.h>
-#include <PubSubClient.h>
-#include <ArduinoJson.h>
-#include "SPI.h"
-#include "Adafruit_GFX.h"
-#include "Adafruit_ILI9341.h"
+/*
+MIT License
+Copyright (c) 2019 Pavel Slama
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+#include <limits.h>
+#if defined(NTP_SUPPORT) || defined(HAS_RTC)
+    #include <Timezone.h>
+#endif
 
-#include "settings.h"
-#include "display.h"
+#include "const.h"
+#include "load.h"
 #include "wifi.h"
-#include "time.h"
 #include "mqtt.h"
+#include "ota.h"
+#include "button.h"
 
+#if defined(NTP_SUPPORT) || defined(HAS_RTC)
+    #include "clock.h"
+#endif
+
+#include "display.h"
 
 void setup() {
-  Serial.begin(115200);
-  Serial.println("ESP8266 ILI9341 MQTT"); 
-  pinMode(LED_PIN,OUTPUT);
-  pinMode(RST_PIN,INPUT);
-  digitalWrite(LED_PIN,HIGH);
-  
-  tft.begin();
-  setupWifi();
-  setupTime();
-  setupMqtt();
-}
+#if defined(DEBUG) || defined(DEBUG_ESP_PORT)
+    Serial.begin(115200);
+    Serial.println();
+#endif
 
-void loop(){
-  ArduinoOTA.handle();
+    setupDisplay();
 
-  if (!client.connected()) {
-    long now = millis();
-    if (now - lastReconnectAttempt > 5000) {
-      lastReconnectAttempt = now;
-      if (mqttReconnect()) {
-        lastReconnectAttempt = 0;
-      }
+    if (loadDefaultConfig()) {
+        buttonSetup();
+
+#if defined(NTP_SUPPORT) || defined(HAS_RTC)
+        setupTime();
+#endif
+        mqttSetup();
+        wifiSetup();
+        otaSetup();
+
+    } else {
+        while (1) {};
     }
-  } else {
-    client.loop();
-  }
-  
-  if((draw_all && !night_mode) || (!night_mode && night_mode_prev)) {
-    digitalWrite(LED_PIN,HIGH);
-    drawAll();
-  }
-  if(night_mode && !night_mode_prev) {
-    analogWrite(LED_PIN, 30);
-    tft.fillScreen(background_colour);
-    drawTime();
-  }
-  if(!popup) timeRefresh();
-  
-  night_mode_prev = night_mode;
 }
 
+void loop() {
+    otaLoop();
+
+    if (!ota_in_progess) {
+        wifiManager.process();
+        buttonLoop();
+        displayLoop();
+
+        if (WiFi.isConnected()) {
+            mqttLoop();
+#if defined(NTP_SUPPORT) || defined(HAS_RTC)
+            timeLoop();
+#endif
+        }
+    }
+
+#if defined(HTTP_OTA)
+
+    if (do_http_update) {
+        do_http_update = false;
+        httpUpdate();
+    }
+
+#endif
+}
