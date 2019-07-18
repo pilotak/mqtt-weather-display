@@ -19,7 +19,7 @@
 
 #define MQTT_TOPIC_IN_TEMP        DEVICE_NAME "/in-temp"
 #define MQTT_TOPIC_OUT_TEMP       DEVICE_NAME "/out-temp"
-#define MQTT_TOPIC_OUT_TEMP_FEEL  DEVICE_NAME "/out_temp-feel"
+#define MQTT_TOPIC_OUT_TEMP_FEEL  DEVICE_NAME "/out-temp-feel"
 #define MQTT_TOPIC_FORECAST       DEVICE_NAME "/forecast"
 #define MQTT_TOPIC_POWER          DEVICE_NAME "/power"
 #define MQTT_TOPIC_NIGHT_MODE     DEVICE_NAME "/night"
