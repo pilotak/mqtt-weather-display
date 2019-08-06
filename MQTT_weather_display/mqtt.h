@@ -58,26 +58,6 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
         NTP.getTime();
 #endif
 
-    } else if (strcmp(topic, MQTT_TOPIC_IN_TEMP) == 0 && len > 1) {
-        in_temp = atof(payload);
-        display_event = IN_TEMP;
-
-    } else if (strcmp(topic, MQTT_TOPIC_OUT_TEMP) == 0 && len > 1) {
-        out_temp = atof(payload);
-        display_event = OUT_TEMP;
-
-    } else if (strcmp(topic, MQTT_TOPIC_OUT_TEMP_FEEL) == 0 && len > 1) {
-        out_temp_feel = atof(payload);
-        display_event = OUT_TEMP_FEEL;
-
-    } else if (strcmp(topic, MQTT_TOPIC_FORECAST) == 0 && len > 0) {
-        forecast_icon = atoi(payload);
-        display_event = FORECAST;
-
-    } else if (strcmp(topic, MQTT_TOPIC_POWER) == 0 && len > 0) {
-        power_value = atoi(payload);
-        display_event = POWER;
-
     } else if (strcmp(topic, MQTT_TOPIC_NIGHT_MODE) == 0 && len == 1) {
         if (payload[0] == '0') {
             if (night_mode) {
@@ -92,6 +72,36 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
                 analogWrite(LED_PIN, 30);
                 display_event = ALL;
             }
+        }
+
+    } else if (len > 0) {
+        char* buffer = new char[len];
+
+        if (buffer) {
+            memcpy(buffer, payload, len);
+
+            if (strcmp(topic, MQTT_TOPIC_IN_TEMP) == 0 && len > 1) {
+                in_temp = atof(buffer);
+                display_event = IN_TEMP;
+
+            } else if (strcmp(topic, MQTT_TOPIC_OUT_TEMP) == 0 && len > 1) {
+                out_temp = atof(buffer);
+                display_event = OUT_TEMP;
+
+            } else if (strcmp(topic, MQTT_TOPIC_OUT_TEMP_FEEL) == 0 && len > 1) {
+                out_temp_feel = atof(buffer);
+                display_event = OUT_TEMP_FEEL;
+
+            } else if (strcmp(topic, MQTT_TOPIC_FORECAST) == 0) {
+                forecast_icon = atoi(buffer);
+                display_event = FORECAST;
+
+            } else if (strcmp(topic, MQTT_TOPIC_POWER) == 0) {
+                power_value = atoi(buffer);
+                display_event = POWER;
+            }
+
+            delete[] buffer;
         }
     }
 }
