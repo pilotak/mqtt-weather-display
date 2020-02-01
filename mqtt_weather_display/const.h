@@ -41,7 +41,6 @@
 #define TIME_SYNC_INTERVAL 600  // sec; NTP should not be that often
 #endif
 
-#define NTP_SERVER_NAME    "ntp.nic.cz"
 #define NTP_SERVER_NAME    "pool.ntp.org"
 
 TimeChangeRule summerTime   = {"CEST", Last, Sun, Mar, 2, 120};    // UTC + 2 hours
