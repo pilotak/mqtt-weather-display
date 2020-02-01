@@ -61,10 +61,10 @@ class IntParameter : public WiFiManagerParameter {
 };
 
 // mqtt.h
-#include <AsyncMqttClient.h>
+#include <GAsyncMqttClient.h>
 #include <Ticker.h>
 
-AsyncMqttClient mqtt;
+GAsyncMqttClient mqtt;
 Ticker mqttReconnectTimer;
 
 char mqtt_server[40];
