@@ -1,25 +1,47 @@
+#if defined(HAS_RTC)
+static time_t getRtcTime() {
+#if defined(NTP_SUPPORT)
+    static uint8_t counter = 1;
+
+    if (counter >= NTP_TIME_RESYNC) {
+        counter = 0;
+        NTP.begin(NTP_SERVER_NAME);  // once synced, RTC will be used as default time provider
+    }
+
+    counter++;
+#endif
+
+    return RTC.get();
+}
+#endif
+
 #if defined(NTP_SUPPORT)
 void processNtpEvent(NTPSyncEvent_t ntpEvent) {
     if (ntpEvent == timeSyncd) {
         time_t last_time = NTP.getLastNTPSync();
+
+        char buffer[12];
+        size_t len = snprintf(buffer, sizeof(buffer), "%lu", last_time);
+
+        if (last_time > 1546300800) {  // 1.1.2019
 #if defined(HAS_RTC)
-        RTC.set(last_time);
+            RTC.set(last_time);
 
-        if (!rtc_ok && RTC.get() >= last_time) {
+            if (RTC.get() == last_time) {
 #if defined(DEBUG)
-            Serial.println("[TIME] RTC is working, will use it as default sync provider");
+                Serial.println("[TIME] RTC OK, will use it as default sync provider");
 #endif
-            NTP.stop();
-            rtc_ok = true;
-            setSyncInterval(TIME_SYNC_INTERVAL);
-            setSyncProvider(RTC.get);
+                NTP.stop();
+                setSyncInterval(TIME_SYNC_INTERVAL);
+                setSyncProvider(getRtcTime);
+            }
+
+#endif
+#if defined(DEBUG)
+            Serial.print("[TIME] Got new NTP time: ");
+            Serial.println(NTP.getTimeDateString(myTZ.toLocal(last_time, &tcr)));
+#endif
         }
-
-#endif
-#if defined(DEBUG)
-        Serial.print("[TIME] Got new NTP time: ");
-        Serial.println(NTP.getTimeDateString(myTZ.toLocal(last_time, &tcr)));
-#endif
     }
 }
 #endif
@@ -37,12 +59,10 @@ void printDigits(int digits) {
 void setupTime() {
 #if defined(HAS_RTC)
     Wire.begin(SDA_PIN, SCL_PIN);
-    setSyncProvider(RTC.get);
+    setSyncProvider(getRtcTime);
     setSyncInterval(TIME_SYNC_INTERVAL);
 
     if (timeStatus() != timeSet) {
-        rtc_ok = false;
-
 #if defined(DEBUG)
         Serial.println("[TIME] Unable to sync with the RTC");
 #endif
@@ -55,7 +75,6 @@ void setupTime() {
 
     } else {
         time_t current_time = myTZ.toLocal(now(), &tcr);
-        rtc_ok = true;
         drawTime();
 
 #if defined(DEBUG)

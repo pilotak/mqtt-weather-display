@@ -1,5 +1,5 @@
 #define DEVICE_NAME "mqtt-weather-display"  // used for MQTT, OTA, AP
-#define FW_VERSION "1.0.0"
+#define FW_VERSION "1.0.1"
 
 #define CONFIG_PATH               "/config.json"
 #define CONFIG_AP_SSID            DEVICE_NAME "-config"
@@ -34,7 +34,14 @@
 #define OTA_PORT              8266  // for local updates
 
 #if defined(NTP_SUPPORT) || defined(HAS_RTC)
+#if defined(HAS_RTC)
 #define TIME_SYNC_INTERVAL 180  // sec
+#define NTP_TIME_RESYNC    24  // this * TIME_SYNC_INTERVAL = resync time
+#else
+#define TIME_SYNC_INTERVAL 600  // sec; NTP should not be that often
+#endif
+
+#define NTP_SERVER_NAME    "ntp.nic.cz"
 #define NTP_SERVER_NAME    "pool.ntp.org"
 
 TimeChangeRule summerTime   = {"CEST", Last, Sun, Mar, 2, 120};    // UTC + 2 hours
