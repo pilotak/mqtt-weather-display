@@ -1,5 +1,6 @@
 # MQTT weather display
 [![Build status](https://github.com/pilotak/mqtt-weather-display/workflows/build/badge.svg)](https://github.com/pilotak/mqtt-weather-display/actions)
+[![Framework Badge Arduino](https://img.shields.io/badge/framework-arduino-00979C.svg)](https://arduino.cc)
 
 Simple weather and time display, ready to be controlled from MQTT, based on ESP8266, ILI9341 and DS3231. Icon names are based on clientraw format weather station.
 
