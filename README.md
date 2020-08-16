@@ -1,5 +1,5 @@
 # MQTT weather display
-[![Build Status](https://travis-ci.org/pilotak/mqtt-weather-display.svg?branch=master)](https://travis-ci.org/pilotak/mqtt-weather-display)
+[![Build status](https://github.com/pilotak/mqtt-weather-display/workflows/build/badge.svg)](https://github.com/pilotak/mqtt-weather-display/actions)
 
 Simple weather and time display, ready to be controlled from MQTT, based on ESP8266, ILI9341 and DS3231. Icon names are based on clientraw format weather station.
 
