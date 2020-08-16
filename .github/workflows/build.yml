@@ -50,8 +50,8 @@ jobs:
 
           for path in ./.pio/build/*/; do
             name="$(basename "${path}")"
-            mv "./.pio/build/$name/firmware.hex" "$name.hex"
-            assets+=("-a" "$name.hex")
+            mv "./.pio/build/$name/firmware.bin" "$name.bin"
+            assets+=("-a" "$name.bin")
           done
 
           echo "FW ${{ steps.prepare.outputs.version }}" >"CHANGELOG.md"
