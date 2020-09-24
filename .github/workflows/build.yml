@@ -5,12 +5,10 @@ on:
     paths-ignore:
       - "README.md"
     branches:
-      - master
-    tags:
-      - "v*"
+      - "*"
   pull_request:
     branches:
-      - master
+      - "*"
   schedule:
     - cron: "0 8 1 * *"
 
@@ -20,14 +18,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Prepare
-        id: prepare
-        run: |
-          git fetch --prune --unshallow --tags
-
-          CURRENT_TAG=$(git tag --points-at HEAD)
-          echo ::set-output name=version::${CURRENT_TAG//v}
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -41,26 +31,3 @@ jobs:
         if: success()
         run: |
           platformio run -e mqtt_weather_display -e mqtt_weather_display_no_rtc
-
-      - name: Create release
-        if: ${{ success() && steps.prepare.outputs.version != null }}
-        run: |
-          set -x
-          assets=()
-
-          for path in ./.pio/build/*/; do
-            name="$(basename "${path}")"
-            mv "./.pio/build/$name/firmware.bin" "$name.bin"
-            assets+=("-a" "$name.bin")
-          done
-
-          echo "FW ${{ steps.prepare.outputs.version }}" >"CHANGELOG.md"
-          echo "" >>"CHANGELOG.md"
-          echo "## :bookmark_tabs: Changes" >>"CHANGELOG.md"
-          git log --pretty=format:"- %s %H%n" $(git describe --abbrev=0 --tags $(git describe --tags --abbrev=0)^)...$(git describe --tags --abbrev=0) >>"CHANGELOG.md"
-
-          cat "CHANGELOG.md"
-
-          hub release create "${assets[@]}" "--file" "CHANGELOG.md" "$(git tag --points-at HEAD)"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
